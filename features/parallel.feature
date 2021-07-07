@@ -1,3 +1,4 @@
+@fixture.threadpool.create
 Feature: parallel test
     Scenario Outline: parallel run
         Given Executing <feature> <scenario>

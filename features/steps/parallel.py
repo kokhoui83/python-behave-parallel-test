@@ -1,8 +1,5 @@
-from concurrent.futures import ThreadPoolExecutor, wait
 from behave import step
 from behave.__main__ import main as behave_main
-
-executor = ThreadPoolExecutor(max_workers=5)
 
 def feature_executor(*args):
     context = args[0]
@@ -12,5 +9,6 @@ def feature_executor(*args):
 
 @step('Executing {feature} {scenario}')
 def step_impl(context, feature, scenario):
+    executor = context.threadpool['executor']
     test = executor.submit(feature_executor, context, feature, scenario)
-    # test.result()
+    context.threadpool['futures'].append(test)
