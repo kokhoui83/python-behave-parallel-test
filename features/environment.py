@@ -1,5 +1,5 @@
 from behave import fixture, use_fixture
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, CancelledError, TimeoutError
 
 @fixture
 def create_threadpool(context):
@@ -12,11 +12,22 @@ def create_threadpool(context):
     yield context.threadpool['executor']
 
     # check result if needed
-    # for future in as_completed(context.threadpool['futures']):
-    #     print(future.result())
+    for future in as_completed(context.threadpool['futures']):
+        try:
+            result = future.result()
+            print(result)
+        except CancelledError as ce:
+            print(ce)
+        except TimeoutError as te:
+            print(te)
+        except Exception as e:
+            print(e)
     
     # cleanup threadpool once all work is done
-    context.threadpool['executor'].shutdown(wait=True)
+    try:
+        context.threadpool['executor'].shutdown(wait=True)
+    except RuntimeError as re:
+        print(re)
 
 
 def before_tag(context, tag):
